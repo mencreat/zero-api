@@ -16,7 +16,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/zeronewatch-api/(.*)",
       "dest": "server.js"
     },
     {
@@ -25,6 +25,4 @@
     }
   ]
 }
-  
-
   
