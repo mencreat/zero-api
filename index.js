@@ -1,4 +1,30 @@
-const app = require('../server'); // import Express app dari server.js
-const serverless = require('serverless-http');
+// const app = require('./server')
 
-module.exports = serverless(app);
+// const port = process.env.PORT || 5000
+
+// app.listen(port, () => {
+//     console.log(`server runing in http://localhost:${port}`)
+// })
+
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ]
+}
+  
+
+  
