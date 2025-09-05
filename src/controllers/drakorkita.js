@@ -37,6 +37,26 @@ const seriesAll = async (req, res) => {
     }
 }
 
+const testTarget = async (req, res) => {
+  try {
+    const r = await axios.get('https://drakorindo72.kita.hair/all?media_type=tv&page=1', {
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Referer": "https://drakorindo72.kita.hair/",
+        }
+    })
+    res.status(200).json({ status: r.status, html: r.data })
+  } catch (e) {
+    res.status(500).json({
+      message: e.message,
+      status: e?.response?.status,
+      data: e?.response?.data
+    })
+  }
+}
+
 const seriesUpdated = async (req, res) => {
     try {
         const axiosRequest = await axios.get(`${process.env.DRAKORKITA_URL}`, { headers })
@@ -225,6 +245,7 @@ const detailAllType = async (req, res) => {
 
 module.exports = {
     seriesAll,
+    testTarget,
     seriesUpdated,
     movieAll,
     newMovie,

@@ -12,7 +12,8 @@ const {
     genres,
     detailGenres,
     searchAll,
-    detailAllType
+    detailAllType,
+    testTarget
 } = require("../controllers/drakorkita")
 
 // drakorkita
@@ -26,5 +27,6 @@ router.get("/genres", genres)
 router.get("/genres/:endpoint", detailGenres)
 router.get("/search", searchAll)
 router.get("/detail/:endpoint", detailAllType)
+router.get("/testing", testTarget)
 
 module.exports = router
