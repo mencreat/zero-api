@@ -4,12 +4,12 @@ const scrapePopular = async (req, res) => {
     const $ = cheerio.load(res.data)
     const datas = []
 
-    $("div.mainholder > div#content > div.wrapper > div.hotslid > div.bixbox.hothome.full > div.listupd > div.bs")
+    $("div.mainholder > div#content > div.wrapper > div.hotslid > div.bixbox.hothome.full > div.listupd > div.popconslide")
     .each((i, e) => {
         const dataObject = {}
 
-        const title = $(e).find("div.bsx > a").attr("title")
-        const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")
+        const title = $(e).find("div.bs > div.bsx > a").attr("title")
+        const thumbnail = $(e).find("div.bs > div.bsx > a > div.limit > img").attr("src")
         const newestChapter = $(e).find("div.bsx > a > div.bigor > div.adds > div.epxs").text()
         const rating = $(e).find("div.bsx > a > div.bigor > div.adds > div.rt > div.rating > div.numscore").text()
         const linkEndpoint = $(e).find("div.bsx > a").attr("href")

@@ -8,7 +8,8 @@ const drakorkita = require("./src/routes/drakorkita")
 const komiku = require("./src/routes/komiku")
 const nanimex = require("./src/routes/nanimex")
 const kuramanime = require("./src/routes/kuramanime")
-const wibudesu = require("./src/routes/wibudesu")
+const wibudesu = require("./src/routes/wibudesu") 
+const oppadrama = require("./src/routes/oppadrama") 
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use("/komiku", komiku)
 app.use("/nanimex", nanimex)
 app.use("/kuramanime", kuramanime)
 app.use("/wibudesu", wibudesu)
+app.use("/oppadrama", oppadrama)
 
 app.get("/", (req, res) => {
     res.status(200).json({
