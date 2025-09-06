@@ -39,15 +39,21 @@ const seriesAll = async (req, res) => {
 
 const testTarget = async (req, res) => {
   try {
-    const r = await axios.get('https://drakorindo72.kita.hair/all?media_type=tv&page=1', {
+    const { page = 1 } = req.query
+    const r = await axios.get(`${process.env.DRAKORKITA_URL}/all?media_type=tv&page=${page}`, {
         headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
-            "Referer": "https://drakorindo72.kita.hair/",
+            "Referer": "https://drakor.kita.mobi",
         }
     })
-    res.status(200).json({ status: r.status, html: r.data })
+    const datas = await scrapeSeries(req, r)
+    res.status(200).json({ 
+        message: "success",
+        page: parseInt(page),
+        ...datas
+    })
   } catch (e) {
     res.status(500).json({
       message: e.message,
