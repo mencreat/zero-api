@@ -392,3 +392,17 @@ There is some source at zeronewatch api
       ```
       default page is 1
       example: http://localhost:3000/drakorkita/search?query=lookism
+
+
+      https://drakorkita29.kita.hair/
+https://drakorindo22.kita.cam/
+https://drakor84.kita.cam/
+https://drakorkita82.kita.hair/
+https://drakorkita27.kita.cam/
+https://drakorindo26.mywap.blog/
+https://drakorindo29.kita.rest/
+https://drakorkita16.kita.rest/
+https://drakorkita1.kita.rest/
+
+https://drakorkita.cc
+https://drakor.kita.mobi

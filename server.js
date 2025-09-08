@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
             kuramanime_url: process.env.KURAMANIME_URL,
             nanimex_url: process.env.NANIMEX_URL,
             wibudesu_url: process.env.WIBUDESU_URL,
+            oppadrama_url: process.env.OPPADRAMA_URL,
         }
     })
 })
