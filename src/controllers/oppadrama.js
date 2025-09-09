@@ -5,6 +5,7 @@ const {
     scrapeSeries,
     scrapeMovie,
     scrapeDetailAllType,
+    scrapeWacthAllType,
 } = require("../scrapers/oppadrama")
 
 const headers = {
@@ -29,7 +30,8 @@ const series = async (req, res) => {
         res.status(200).json({
             message: "success",
             url: process.env.OPPADRAMA_URL,
-            datas
+            pagination: datas.pagination,
+            datas: datas.datas
         })
     } catch (e) {
         console.log(e)
@@ -58,7 +60,8 @@ const movie = async (req, res) => {
         res.status(200).json({
             message: "success",
             url: process.env.OPPADRAMA_URL,
-            datas
+            pagination: datas.pagination,
+            datas: datas.datas
         })
     } catch (e) {
         console.log(e)
@@ -76,6 +79,29 @@ const detailAllType = async (req, res) => {
         const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/${endpoint}`, { headers })
 
         const data = await scrapeDetailAllType({ endpoint }, axiosRequest)
+
+        res.status(200).json({
+            message: "success",
+            url: process.env.OPPADRAMA_URL,
+            datas: datas.datas
+        })
+
+    } catch (e) {
+        console.log(e)
+
+        res.json({
+            message:`${e}`
+        })
+    }
+}
+
+const watchAllType = async (req, res) => {
+    try {
+        const { endpoint } = req.params
+
+        const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/${endpoint}`, { headers })
+
+        const data = await scrapeWacthAllType({ endpoint }, axiosRequest)
 
         res.status(200).json({
             message: "success",
@@ -126,5 +152,6 @@ module.exports = {
     series,
     movie,
     detailAllType,
+    watchAllType,
     testing
 }

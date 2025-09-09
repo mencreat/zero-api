@@ -95,14 +95,6 @@ const scrapeDetailAllType = async (req, res) => {
     const data = {}
     const genres = []
     const tags = []
-    // return {
-    //     data: $.html()
-    // }
-    const headers = {
-        "Referer" : `${process.env.OPPADRAMA_URL}/detail/${endpoint}/`,
-        "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-        "Cookie" : "vi_0ELVmU7D=64ec09a4ae6db; HstCfa4524841=1693190569537; HstCmu4524841=1693190569537; dlOKBYl4gcFxs8tDGXO9aEvn1m=64ec09c2790c8; vi_04aLkwOpeK=64f09d5904bb1; _gid=GA1.2.65617723.1693649276; vi_hYIdDMKh=64f3d0778b6ac; vi_W25AFbzv1P=64f3d2e07c423; HstCla4524841=1693710948928; HstPn4524841=1; HstPt4524841=26; HstCnv4524841=6; HstCns4524841=10; _ga_DZPG0EZGWW=GS1.1.1693710949.8.0.1693710949.0.0.0; _ga=GA1.2.1604386064.1693190570"
-    }
 
     const parent  = $("article.hentry")
 
@@ -190,70 +182,149 @@ const scrapeDetailAllType = async (req, res) => {
             title: $(e).text(),
         })
         
-        // data.genres = genres
+        data.genres = genres
     })
     
     //tags
     $(parent).find("div.animefull > div.bottom > a")
     .each((i, e) => {
         tags.push($(e).text().trim())
-        // data.tags = tags
+        data.tags = tags
     })
 
-    // get movie id
-    // const onclick = $(parent).find("div.pagination > a").last().attr("onclick")
+    return data
+}
 
-    // const movieIdAndTag = onclick.substring(onclick.indexOf("(") + 1, onclick.indexOf(")"))
-    // const movieId =  movieIdAndTag.split(",")[0].replace(/^'|'$/g, '')
-    // const tag = movieIdAndTag.split(",")[1].replace(/^'|'$/g, '')
+const scrapeWacthAllType = async (req, res) => {
+    const { endpoint } = req
+    const $ = cheerio.load(res.data)
+    const data = {}
+    const genres = []
+    // return {
+    //     data: $.html()
+    // }
 
-    // get episode list
-    // const { data: { episode_lists } } = await axios.get(`${process.env.OPPADRAMA_URL}/api/episode.php?movie_id=${movieId}&tag=${tag}`, {
-    //     headers: headers
-    // })
+    const parent  = $("article.hentry")
 
-    // const $eps = cheerio.load(episode_lists)
-    // const episodes = $eps("p > a").get()
+    const title = $(parent).find("div.single-info > div.infox > div.infolimit > h2").text()
+    const titleAlt = $(parent).find("div.single-info > div.infox > div.infolimit > span.alter").text() 
+    const synopsis = $(parent).find("div.single-info > div.infox > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '')
+    const rating = $(parent).find("div.single-info > div.infox > div.rating > strong").text()
+    const thumbnail = $(parent).find("div.megavid > div.mvelement > div.meta > div.tb > img").attr("src")
+    const thumbnailAlt = $(parent).find('div.megavid > div.mvelement > div.meta > div.tb > meta[itemprop="url"]').attr("content")
+    // const testing = $(parent).find('div.mctn > div.dlbox > div.video-nav > div.mobius > select.mirror').html()
+    
+    const spans = $(parent).find("div.single-info > div.infox > div.info-content > div.spe > span")
+    const airing = spans.filter((i, el) => $(el).find("b").text() === "Dirilis:").first().text().replace("Dirilis:", "").trim();
+    const infoObj = {};
+    
+    spans.each(function() {
+        const text = $(this).text().trim();
+        const match = text.match(/^(.+?):\s*(.+)$/);
+        if(match) {
+            infoObj[match[1]] = match[2];
+        }
+    });
+    
+    const networkStr = infoObj["Network"];
+    const networkList = networkStr ? networkStr.split(",").map(n => n.trim()) : [];
+    const negaraStr = infoObj["Negara"];
+    const negaraList = negaraStr ? negaraStr.split(",").map(n => n.trim()) : [];
+    const artistStr = infoObj["Artis"];
+    const artistList = artistStr ? artistStr.split(",").map(name => ({pict: "", name: name.trim()})) : [];
+    const serverList = [];
+    const episodes = [];
+    const downloadLinks = [];
 
-    // loop episodes
-    // const episodesPromise = episodes.map(async (eps, i) => {
-    //     const dataEps = {}
-    //     const resolutions = []
+    //episodes
+    $('div#sidebar > div#mainepisode > div#singlepisode > div.episodelist > ul > li').each((i, el) => {
+        const anchor = $(el).find('a');
+        const title = anchor.attr('title') || null;
+        const url = anchor.attr('href').trim() || null;
+        const endpoint = url.substring(url.indexOf("/45.11.57.186/") + 14, url.length)
+        const match = title.match(/Episode\s(\d+)/i);
+        const num = match ? parseInt(match[1], 10) : null;
 
-    //     const wrap = $(eps).attr('onclick') 
+        episodes.push({
+            num,
+            title: title.trim(),
+            url: endpoint
+        });
+    });
 
-    //     const EpsIdAndTag = wrap.substring(wrap.indexOf("(") + 1, wrap.indexOf(")"))
-    //     const epsId =  EpsIdAndTag.split(",")[0].replace(/^'|'$/g, '')
-    //     const tag = EpsIdAndTag.split(",")[1].replace(/^'|'$/g, '')
+    //donlot
+    $('div.dlbox ul li').each((i, el) => {
+        if ($(el).hasClass('head')) return;
 
-    //     dataEps.title = `Episode ${++i}`
+        const kualitas = $(el).find('span.w').text().trim();
+        const url = $(el).find('span.e a').attr('href')?.trim();
 
-    //     const { data: {data: { qua, server_id }} } = await axios.get(`${process.env.OPPADRAMA_URL}/api/server.php?episode_id=${epsId}&tag=${tag}`, {
-    //         headers: headers
-    //     }) 
+        if (kualitas && url) {
+                downloadLinks.push({
+                kualitas,
+                url
+            });
+        }
+    });
 
-    //     const { data:{ file } } = await axios.get(`${process.env.OPPADRAMA_URL}/api/video.php?id=${epsId}&qua=${qua}&server_id=${server_id}&tag=${tag}`,{
-    //         headers: headers
-    //     })
+    //server video
+    $('select.mirror option').each((i, el) => {
+        const rawValue = $(el).attr('value')?.trim() || '';
+        const title = $(el).text().trim();
+
+        const isEmpty = rawValue === '';
+        const isPilih = title.toLowerCase().includes('pilih server video');
+
+        if (isEmpty && isPilih) return;
+
+        let decodedValue = rawValue;
+        let src = null;
+
+        try {
+            if (rawValue !== '') {
+                decodedValue = Buffer.from(rawValue, 'base64').toString('utf-8');
+
+                const $iframe = cheerio.load(decodedValue);
+                src = $iframe('iframe').attr('src') || $iframe('IFRAME').attr('SRC') || null;
+            }
+        } catch (err) {
+            console.warn('Gagal decode value:', rawValue);
+            decodedValue = rawValue;
+            src = null;
+        }
+
+        serverList.push({
+            title,
+            value: src
+        });
+    });
+
+    data.title = title
+    data.title_alt = titleAlt
+    data.thumbnail = thumbnail
+    data.thumbnailAlt = thumbnailAlt
+    data.synopsis = synopsis
+    data.rating = parseFloat(rating.match(/[\d\.]+/)[0]);
+    data.status = infoObj["Status"]
+    data.durasi = infoObj["Durasi"]
+    data.network = networkList
+    data.aired = airing
+    data.director = infoObj["Sutradara"]
+    data.type = infoObj["Tipe"]
+    data.donlot = downloadLinks
+    data.negara = negaraList
+    data.artist = artistList
+    data.server = serverList
+    data.totalEpisode = parseInt(infoObj["Episode"], 10) || 0
+    data.episodes = episodes
+    
+    // genres
+    $(parent).find("div.single-info >  div.infox > div.info-content > div.genxed > a")
+    .each((i, e) => {
+        genres.push($(e).text())
         
-    //     const splitFile = file.split(",")
-
-    //     splitFile.map(link => {
-    //         resolutions.push({
-    //             resolution: link.substring(1, 5),
-    //             src: link.substring(link.indexOf("https"), link.length)
-    //         })
-
-    //     })
-
-    //     dataEps.resolutions = resolutions
-
-    //     return dataEps
-    // }) 
-
-    // const resultEpisodes = await Promise.all(episodesPromise)
-
-    // data.episodes = resultEpisodes
+        data.genres = genres
+    })
 
     return data
 }
@@ -262,4 +333,5 @@ module.exports = {
     scrapeSeries,
     scrapeMovie,
     scrapeDetailAllType,
+    scrapeWacthAllType,
 }
