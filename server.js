@@ -10,6 +10,7 @@ const nanimex = require("./src/routes/nanimex")
 const kuramanime = require("./src/routes/kuramanime")
 const wibudesu = require("./src/routes/wibudesu") 
 const oppadrama = require("./src/routes/oppadrama") 
+const anichin = require("./src/routes/anichin") 
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.use("/nanimex", nanimex)
 app.use("/kuramanime", kuramanime)
 app.use("/wibudesu", wibudesu)
 app.use("/oppadrama", oppadrama)
+app.use("/anichin", anichin)
 
 app.get("/", (req, res) => {
     res.status(200).json({

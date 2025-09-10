@@ -83,7 +83,7 @@ const detailAllType = async (req, res) => {
         res.status(200).json({
             message: "success",
             url: process.env.OPPADRAMA_URL,
-            datas: datas.datas
+            datas: data
         })
 
     } catch (e) {
