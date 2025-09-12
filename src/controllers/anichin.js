@@ -5,6 +5,7 @@ const {
     scrapeSeries,
     scrapeMovie,
     scrapeDetail,
+    scrapeWacth
 } = require('../scrapers/cobaanichin')
 
 const headers = {
@@ -86,8 +87,32 @@ const detailData = async (req, res) => {
     }
 }
 
+const watchData = async (req, res) => {
+    try {
+        const { endpoint } = req.params
+
+        const axiosRequest = await axios.get(`${process.env.ANICHIN_URL}/${endpoint}/`, { headers })
+
+        const data = await scrapeWacth({ endpoint }, axiosRequest)
+
+        res.status(200).json({
+            message: "success",
+            url: process.env.ANICHIN_URL,
+            datas: data
+        })
+
+    } catch (e) {
+        console.log(e)
+
+        res.json({
+            message:`${e}`
+        })
+    }
+}
+
 module.exports = { 
     seriesData,
     movieData,
-    detailData
+    detailData,
+    watchData,
 }

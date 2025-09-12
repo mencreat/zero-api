@@ -79,7 +79,7 @@ const scrapeDetail = async (req, res) => {
 
     const title = $(parent).find("div.animefull > div.bigcontent > div.infox > h1").text()
     const titleAlt = $(parent).find("div.animefull > div.bigcontent > div.thumbook > div.thumb > img").attr("title") || null
-    const synopsis = $(parent).find("div.synp > div.entry-content > p").map((i, el) => $(el).text().trim()).get().join('\n\n')
+    const synopsis = $(parent).find("div.synp > div.entry-content > p").map((i, el) => $(el).text().trim()).get().join('\n\n').replace(/Berikut adalah poin-poin penting dari sinopsisnya:/, '')
     const thumbnail = $(parent).find("div.animefull > div.bigcontent > div.thumbook > div.thumb > img").attr("src")
     const description = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
     const midesc = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.mindesc").html().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
@@ -185,9 +185,10 @@ const scrapeWacth = async (req, res) => {
     const title = $(parent).find("div.single-info > div.infox > div.infolimit > h2").text()
     const titleAlt = $(parent).find("div.single-info > div.infox > div.infolimit > span.alter").text() 
     const synopsis = $(parent).find("div.single-info > div.infox > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '')
-    const rating = $(parent).find("div.single-info > div.infox > div.rating > strong").text()
+    const rating = $(parent).find("div.single-info > div.infox > div.rating > strong").text().replace(/Rating /, '') || null
     const thumbnail = $(parent).find("div.megavid > div.mvelement > div.meta > div.tb > img").attr("src")
     const thumbnailAlt = $(parent).find('div.megavid > div.mvelement > div.meta > div.tb > meta[itemprop="url"]').attr("content")
+    const description = $(parent).find("div.entry-content > div.infx > p").text().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
     // const testing = $(parent).find('div.mctn > div.dlbox > div.video-nav > div.mobius > select.mirror').html()
     
     const spans = $(parent).find("div.single-info > div.infox > div.info-content > div.spe > span")
@@ -213,13 +214,13 @@ const scrapeWacth = async (req, res) => {
     const downloadLinks = [];
 
     //episodes
-    $('div#sidebar > div#mainepisode > div#singlepisode > div.episodelist > ul > li').each((i, el) => {
+    $('div#singlepisode > div.episodelist > ul > li').each((i, el) => {
         const anchor = $(el).find('a');
-        const title = anchor.attr('title') || null;
+        const title = anchor.find('div.playinfo > h3').text() || null;
         const url = anchor.attr('href').trim() || null;
-        const endpoint = url.substring(url.indexOf("/45.11.57.186/") + 14, url.length)
+        const endpoint = url.substring(url.indexOf("/anichin.digital/") + 17, url.length)
         const match = title.match(/Episode\s(\d+)/i);
-        const num = match ? parseInt(match[1], 10) : null;
+        const num = match ? parseInt(match[1], 10) : i+1 || null;
 
         episodes.push({
             num,
@@ -229,11 +230,11 @@ const scrapeWacth = async (req, res) => {
     });
 
     //donlot
-    $('div.dlbox ul li').each((i, el) => {
+    $('div.soraddlx > div.soraurlx').each((i, el) => {
         if ($(el).hasClass('head')) return;
 
-        const kualitas = $(el).find('span.w').text().trim();
-        const url = $(el).find('span.e a').attr('href')?.trim();
+        const kualitas = $(el).find('strong').text().trim();
+        const url = $(el).find('a').attr('href')?.trim();
 
         if (kualitas && url) {
                 downloadLinks.push({
@@ -280,7 +281,8 @@ const scrapeWacth = async (req, res) => {
     data.thumbnail = thumbnail
     data.thumbnailAlt = thumbnailAlt
     data.synopsis = synopsis
-    data.rating = parseFloat(rating.match(/[\d\.]+/)[0]);
+    data.description = description
+    data.rating = parseFloat(rating?.match(/[\d\.]+/)[0]) || 0
     data.status = infoObj["Status"]
     data.durasi = infoObj["Durasi"]
     data.network = networkList
@@ -309,4 +311,5 @@ module.exports = {
     scrapeSeries,
     scrapeMovie,
     scrapeDetail,
+    scrapeWacth
 }

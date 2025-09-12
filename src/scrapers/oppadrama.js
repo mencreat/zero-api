@@ -103,10 +103,10 @@ const scrapeDetailAllType = async (req, res) => {
     const synopsis = $(parent).find("div.synp > div.entry-content > p").map((i, el) => $(el).text().trim()).get().join('\n\n')
     const thumbnail = $(parent).find("div.animefull > div.bigcover > div.ime > img").attr("src")
     const description = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '').replace(/OPPADRAMA/g, 'STREAMCUY')
-    const midesc = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.mindesc").html().replace(/[\n\r\t\\]+/g, '').replace(/OPPADRAMA/g, 'STREAMCUY')
-    const rating = $(parent).find("div.rt > div.rating > strong").text().trim()
-    const trailerSrc = $(parent).find("div.trailer > div.tply > iframe").attr("src")
-    const trailerTitle = $(parent).find("div.trailer > div.tply > iframe").attr("title")
+    const midesc = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.mindesc").html().replace(/[\n\r\t\\]+/g, '').replace(/\u003Cb\u003E|\u003C\/b\u003E/g, '').replace(/OPPADRAMA/g, 'STREAMCUY')
+    const rating = $(parent).find("div.rt > div.rating > strong").text().trim().replace(/Rating /, '') || null
+    const trailerTitle = $(parent).find("div.trailer > div.tply > iframe").attr("title") || null
+    const trailerSrc = $(parent).find("div.trailer > div.tply > iframe").attr("src") || null
     const spans = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.spe > span")
     const airing = spans.filter((i, el) => $(el).find("b").text() === "Dirilis:").first().text().replace("Dirilis:", "").trim();
     const dirilis = spans.filter((i, el) => { return $(el).find('b').text() === 'Dirilis:' }).find('time').text().trim();
@@ -123,11 +123,11 @@ const scrapeDetailAllType = async (req, res) => {
     });
 
     const negaraStr = infoObj["Negara"];
-    const negaraList = negaraStr ? negaraStr.split(",").map(n => n.trim()) : [];
+    const negaraList = negaraStr ? negaraStr.split(",").map(n => n.trim()) : null;
     const artistStr = infoObj["Artis"];
-    const artistList = artistStr ? artistStr.split(",").map(name => ({pict: "", name: name.trim()})) : [];
+    const artistList = artistStr ? artistStr.split(",").map(name => ({pict: "", name: name.trim()})) : null;
     const networkStr = infoObj["Network"];
-    const networkList = networkStr ? networkStr.split(",").map(n => n.trim()) : [];
+    const networkList = networkStr ? networkStr.split(",").map(n => n.trim()) : null;
     
     const trailer = {
         title: trailerTitle,
@@ -157,32 +157,30 @@ const scrapeDetailAllType = async (req, res) => {
     data.synopsis = synopsis
     data.description = description
     data.midesc = midesc
-    data.rating = parseFloat(rating.match(/[\d\.]+/)[0]);
-    data.episodes = episodes
+    data.rating = parseFloat(rating?.match(/[\d\.]+/)[0]) || null
     data.status = infoObj["Status"]
     data.durasi = infoObj["Durasi"]
     data.dirilis = dirilis
     data.airing = airing
     data.director = infoObj["Sutradara"]
+    data.studio = infoObj["Studio"]
     data.updated = infoObj["Diperbarui pada"]
     data.totalEpisode = parseInt(infoObj["Episode"], 10) || 0
     data.type = infoObj["Tipe"]
-    data.negara = negaraList
-    data.artist = artistList
-    data.network = networkList
-    data.trailer = trailer
     data.penerbit = infoObj["Diposting oleh"]
+    data.genres = genres
+    data.trailer = trailer
+    data.artist = artistList
+    data.negara = negaraList
+    data.network = networkList
+    data.episodes = episodes
     // data.info_detail = infoObj
 
     
     // genres
     $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.genxed > a")
     .each((i, e) => {
-        genres.push({
-            title: $(e).text(),
-        })
-        
-        data.genres = genres
+        genres.push($(e).text())
     })
     
     //tags
