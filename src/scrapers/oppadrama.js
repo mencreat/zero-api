@@ -89,6 +89,38 @@ const scrapeMovie = async (req, res) => {
     }
 }
 
+const scrapeByGenre = async (req, res) => {
+    const $ = cheerio.load(res.data)
+    const datas = []
+
+    $("div.listupd article.bs")
+    .each((i, e) => {
+        const dataObject = {}
+
+        const title = $(e).find("div.bsx > a > div.limit > img").attr("alt")  || null
+        const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  
+        const type = $(e).find("div.bsx > a > div.limit > div.typez").text()
+        const status = $(e).find("div.limit > div.bt > span.epx").text()
+        const subt = $(e).find("div.limit > div.bt > span.sb").text()
+        const linkEndpoint = $(e).find("div.bsx > a").attr("href")
+        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf("/45.11.57.186/") + 14, linkEndpoint.length)
+
+        dataObject.title = title
+        dataObject.thumbnail = thumbnail
+        dataObject.type = type
+        dataObject.status = status
+        dataObject.subt = subt
+        dataObject.endpoint = endpoint
+
+        datas.push(dataObject)
+    })
+
+    return {
+        pagination: 13,
+        datas
+    }
+}
+
 const scrapeDetailAllType = async (req, res) => {
     const { endpoint } = req
     const $ = cheerio.load(res.data)
@@ -332,4 +364,5 @@ module.exports = {
     scrapeMovie,
     scrapeDetailAllType,
     scrapeWacthAllType,
+    scrapeByGenre,
 }

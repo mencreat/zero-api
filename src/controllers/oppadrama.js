@@ -6,6 +6,7 @@ const {
     scrapeMovie,
     scrapeDetailAllType,
     scrapeWacthAllType,
+    scrapeByGenre,
 } = require("../scrapers/oppadrama")
 
 const headers = {
@@ -56,6 +57,37 @@ const movie = async (req, res) => {
         })
 
         const datas = await scrapeMovie(req, axiosRequest)
+        
+        res.status(200).json({
+            message: "success",
+            url: process.env.OPPADRAMA_URL,
+            pagination: datas.pagination,
+            datas: datas.datas
+        })
+    } catch (e) {
+        console.log(e)
+
+        res.json({
+            message: `Error: ${e}` 
+        })
+    }
+}
+
+const genre = async (req, res) => {
+    try {
+        const {page = 1, type} = req.query
+        const { genre } = req.params
+        const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/series/?page=${page}&genre%5B%5D=${genre}&type=${type}&order=update`, {
+            maxRedirects: 0,
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+                "Referer": "https://oppa.biz",
+            }
+        })
+
+        const datas = await scrapeByGenre(req, axiosRequest)
         
         res.status(200).json({
             message: "success",
@@ -153,5 +185,6 @@ module.exports = {
     movie,
     detailAllType,
     watchAllType,
+    genre,
     testing
 }
