@@ -270,15 +270,20 @@ const scrapeWacthAllType = async (req, res) => {
     $('div#sidebar > div#mainepisode > div#singlepisode > div.episodelist > ul > li').each((i, el) => {
         const anchor = $(el).find('a');
         const title = anchor.attr('title') || null;
+        const tamnel = anchor.find('div.thumbnel > img').attr('src').trim();
         const url = anchor.attr('href').trim() || null;
         const endpoint = url.substring(url.indexOf("/45.11.57.186/") + 14, url.length)
         const match = title.match(/Episode\s(\d+)/i);
-        const num = match ? parseInt(match[1], 10) : null;
+        const episode = match ? parseInt(match[1], 10) : null;
+        const time = anchor.find('div.playinfo > span').text().trim();
 
         episodes.push({
-            num,
-            title: title.trim(),
-            url: endpoint
+            episode,
+            juduleps: title.trim(),
+            tamnel,
+            // url: endpoint,
+            time,
+            slug: endpoint
         });
     });
 
