@@ -14,6 +14,7 @@ const scrapeSeries = async (req, res) => {
         const dataObject = {}
 
         const title = $(e).find("div.bsx > a").attr("title")  || null
+        const title_alt = $(e).find("div.bsx > a > div.limit > img").attr("title")  || null
         const status = $(e).find("div.bsx > a > div.limit > div.bt > span.epx").text()  || null
         const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  || null
         const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
@@ -21,9 +22,10 @@ const scrapeSeries = async (req, res) => {
         const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
         
         dataObject.title = title
+        dataObject.title_alt = title_alt
         dataObject.thumbnail = thumbnail
-        dataObject.status = status
         dataObject.type = type
+        dataObject.status = status
         dataObject.endpoint = endpoint
         
         datas.push(dataObject)
@@ -48,6 +50,7 @@ const scrapeMovie = async (req, res) => {
         const dataObject = {}
 
         const title = $(e).find("div.bsx > a").attr("title")  || null
+        const title_alt = $(e).find("div.bsx > a > div.limit > img").attr("title")  || null
         const status = $(e).find("div.bsx > a > div.limit > div.bt > span.epx").text()  || null
         const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  || null
         const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
@@ -55,9 +58,10 @@ const scrapeMovie = async (req, res) => {
         const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
         
         dataObject.title = title
+        dataObject.title_alt = title_alt
         dataObject.thumbnail = thumbnail
-        dataObject.status = status
         dataObject.type = type
+        dataObject.status = status
         dataObject.endpoint = endpoint
         
         datas.push(dataObject)
@@ -65,6 +69,36 @@ const scrapeMovie = async (req, res) => {
 
     return {
         pagination: 1,
+        datas
+    }
+}
+
+const scrapeByGenre = async (req, res) => {
+    const $ = cheerio.load(res.data)
+    const datas = []
+
+    $("div.listupd article.bs")
+    .each((i, e) => {
+        const dataObject = {}
+
+        const title = $(e).find("div.bsx > a").attr("title")  || null
+        const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  || null
+        const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
+        const status = $(e).find("div.bsx > a > div.limit > div.bt > span.epx").text()  || null
+        const url = $(e).find("div.bsx > a").attr("href")
+        const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
+
+        dataObject.title = title
+        dataObject.thumbnail = thumbnail
+        dataObject.type = type
+        dataObject.status = status
+        dataObject.endpoint = endpoint
+
+        datas.push(dataObject)
+    })
+
+    return {
+        pagination: 13,
         datas
     }
 }
@@ -142,30 +176,29 @@ const scrapeDetail = async (req, res) => {
     data.description = description
     data.midesc = midesc
     data.rating = parseFloat(rating?.match(/[\d\.]+/)[0]);
-    data.episodes = episodes
     data.status = infoObj["Status"]
-    data.studio = infoObj["Studio"]
     data.durasi = infoObj["Durasi"]
     data.dirilis = dirilis
     data.airing = airing
     data.director = infoObj["Sutradara"]
+    data.studio = infoObj["Studio"]
     data.updated = infoObj["Diperbarui pada"]
-    data.endpoint = link
     data.totalEpisode = parseInt(infoObj["Episode"], 10) || 0
     data.type = infoObj["Tipe"]
-    data.negara = negaraList
-    data.artist = artistList
-    data.network = networkList
-    data.trailer = trailer
     data.penerbit = infoObj["Diposting oleh"]
+    data.genres = genres
+    data.trailer = trailer
+    data.artist = artistList
+    data.negara = negaraList
+    data.endpoint = link
+    data.network = networkList
+    data.episodes = episodes
 
     
     // genres
     $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.genxed > a")
     .each((i, e) => {
         genres.push($(e).text())
-        
-        data.genres = genres
     })
 
     return data
@@ -310,6 +343,7 @@ const scrapeWacth = async (req, res) => {
 module.exports = { 
     scrapeSeries,
     scrapeMovie,
+    scrapeByGenre,
     scrapeDetail,
     scrapeWacth
 }
