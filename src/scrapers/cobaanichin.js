@@ -250,15 +250,19 @@ const scrapeWacth = async (req, res) => {
     $('div#singlepisode > div.episodelist > ul > li').each((i, el) => {
         const anchor = $(el).find('a');
         const title = anchor.find('div.playinfo > h3').text() || null;
+        const time = anchor.find('div.playinfo > span').text() || null;
         const url = anchor.attr('href').trim() || null;
+        const tamnel = anchor.find('div.thumbnel > img').attr('src') || null
         const endpoint = url.substring(url.indexOf("/anichin.digital/") + 17, url.length)
         const match = title.match(/Episode\s(\d+)/i);
-        const num = match ? parseInt(match[1], 10) : i+1 || null;
+        const episode = match ? parseInt(match[1], 10) : i+1 || null;
 
         episodes.push({
-            num,
-            title: title.trim(),
-            url: endpoint
+            episode,
+            juduleps: title.trim(),
+            tamnel,
+            time,
+            slug: endpoint
         });
     });
 
