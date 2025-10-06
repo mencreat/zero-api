@@ -30,11 +30,15 @@ const seriesData = async (req, res) => {
         page: parseInt(page),
         ...datas
     })
-  } catch (e) {
+} catch (e) {
     res.status(500).json({
-      message: e.message,
-      status: e?.response?.status,
-      data: e?.response?.data
+        // message: e.message,
+        message: "success",
+        page: 1,
+        pagination: 1,
+    //   status: e?.response?.status,
+    //   data: e?.response?.data
+      datas: []
     })
   }
 }
@@ -56,11 +60,15 @@ const movieData = async (req, res) => {
         page: parseInt(page),
         ...datas
     })
-  } catch (e) {
+} catch (e) {
     res.status(500).json({
-      message: e.message,
-      status: e?.response?.status,
-      data: e?.response?.data
+        // message: e.message,
+        message: "success",
+        page: 1,
+        pagination: 1,
+    //   status: e?.response?.status,
+    //   data: e?.response?.data
+      datas: []
     })
   }
 }
