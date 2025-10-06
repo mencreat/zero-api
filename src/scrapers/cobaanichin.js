@@ -98,7 +98,7 @@ const scrapeByGenre = async (req, res) => {
     })
 
     return {
-        pagination: 13,
+        pagination: 10,
         datas
     }
 }
