@@ -5,6 +5,7 @@ const router = Router()
 const {
     series,
     movie,
+    tvshow,
     detailAllType,
     watchAllType,
     genre,
@@ -14,6 +15,7 @@ const {
 // komiku
 router.get("/series", series)
 router.get("/movie", movie)
+router.get("/tv", tvshow)
 router.get("/detail/:endpoint", detailAllType)
 router.get("/watch/:endpoint", watchAllType)
 router.get("/genre/:genre", genre)
