@@ -1,6 +1,7 @@
 const cheerio = require("cheerio")
 const axios = require("axios")
-
+const rawUrl = process.env.OPPADRAMA_URL
+const hostname = rawUrl ? new URL(rawUrl).hostname : "";
 const scrapeSeries = async (req, res) => {
     const $ = cheerio.load(res.data)
     const datas = []
@@ -19,7 +20,7 @@ const scrapeSeries = async (req, res) => {
         const status = $(e).find("div.limit > div.bt > span.epx").text()
         const subt = $(e).find("div.limit > div.bt > span.sb").text()
         const linkEndpoint = $(e).find("div.bsx > a").attr("href")
-        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf("/45.11.57.125/") + 14, linkEndpoint.length)
+        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf(`/${hostname}/`) + 14, linkEndpoint.length)
 
         dataObject.title = title
         dataObject.title_alt = alternative
@@ -69,7 +70,7 @@ const scrapeMovie = async (req, res) => {
         const status = $(e).find("div.limit > div.bt > span.epx").text()
         const subt = $(e).find("div.limit > div.bt > span.sb").text()
         const linkEndpoint = $(e).find("div.bsx > a").attr("href")
-        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf("/45.11.57.125/") + 14, linkEndpoint.length)
+        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf(`/${hostname}/`) + 14, linkEndpoint.length)
 
         dataObject.title = title
         dataObject.title_alt = alternative
@@ -103,7 +104,7 @@ const scrapeByGenre = async (req, res) => {
         const status = $(e).find("div.limit > div.bt > span.epx").text()
         const subt = $(e).find("div.limit > div.bt > span.sb").text()
         const linkEndpoint = $(e).find("div.bsx > a").attr("href")
-        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf("/45.11.57.125/") + 14, linkEndpoint.length)
+        const endpoint = linkEndpoint.substring(linkEndpoint.indexOf(`/${hostname}/`) + 14, linkEndpoint.length)
 
         dataObject.title = title
         dataObject.thumbnail = thumbnail
@@ -173,7 +174,7 @@ const scrapeDetailAllType = async (req, res) => {
         const title = a.find("div.epl-title").text().trim()
         const date = a.find("div.epl-date").text().trim()
         const endpoint = a.attr("href")
-        const slug = endpoint.substring(endpoint.indexOf("/45.11.57.125/") + 14, endpoint.length)
+        const slug = endpoint.substring(endpoint.indexOf(`/${hostname}/`) + 14, endpoint.length)
 
         episodes.push({
             num,
@@ -272,7 +273,7 @@ const scrapeWacthAllType = async (req, res) => {
         const title = anchor.attr('title') || null;
         const tamnel = anchor.find('div.thumbnel > img').attr('src').trim();
         const url = anchor.attr('href').trim() || null;
-        const endpoint = url.substring(url.indexOf("/45.11.57.125/") + 14, url.length)
+        const endpoint = url.substring(url.indexOf(`/${hostname}/`) + 14, url.length)
         const match = title.match(/Episode\s(\d+)/i);
         const episode = match ? parseInt(match[1], 10) : null;
         const time = anchor.find('div.playinfo > span').text().trim();
