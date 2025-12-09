@@ -17,7 +17,7 @@ const series = async (req, res) => {
     try {
         const { page = 1 } = req.query
         const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/series/?page=${page}&type=Drama&order=update`, {
-            maxRedirects: 0,
+            maxRedirects: 1,
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -37,6 +37,15 @@ const series = async (req, res) => {
     } catch (e) {
         console.log(e)
 
+        if (e.code === "ETIMEDOUT" || e.code === "ECONNABORTED" || e.code === "ECONNREFUSED") {
+            return res.status(200).json({
+                message: "success (empty)",
+                url: process.env.OPPADRAMA_URL,
+                pagination: {},
+                datas: []
+            });
+        }
+
         res.json({
             message: `Error: ${e}` 
         })
@@ -47,7 +56,7 @@ const tvshow = async (req, res) => {
     try {
         const { page = 1 } = req.query
         const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/series/?page=${page}&type=TV+Show&order=update`, {
-            maxRedirects: 0,
+            maxRedirects: 1,
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -77,7 +86,7 @@ const movie = async (req, res) => {
     try {
         const { page = 1 } = req.query
         const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/series/?page=${page}&type=Movie&order=update`, {
-            maxRedirects: 0,
+            maxRedirects: 1,
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -108,7 +117,7 @@ const genre = async (req, res) => {
         const {page = 1, type} = req.query
         const { genre } = req.params
         const axiosRequest = await axios.get(`${process.env.OPPADRAMA_URL}/series/?page=${page}&genre%5B%5D=${genre}&type=${type}&order=update`, {
-            maxRedirects: 0,
+            maxRedirects: 1,
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
