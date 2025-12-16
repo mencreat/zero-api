@@ -27,10 +27,14 @@ const series = async (req, res) => {
         })
 
         const datas = await scrapeSeries(req, axiosRequest)
-        
+        const redirectUrl = axiosRequest.request?.res?.responseUrl
+        const parsed = new URL(redirectUrl)
+        const hostOnly = `/${parsed.hostname}/`
+
         res.status(200).json({
             message: "success",
             url: process.env.OPPADRAMA_URL,
+            direct: hostOnly,
             pagination: datas.pagination,
             datas: datas.datas
         })
