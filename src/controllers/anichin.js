@@ -16,12 +16,12 @@ const headers = {
 const seriesData = async (req, res) => {
   try {
     const { page = 1 } = req.query
-    const r = await axios.get(`${process.env.ANICHIN_URL}/donghua/?page=${page}`, {
+    const r = await axios.get(`${process.env.ANICHIN_URL}/series/?page=${page}`, {
         headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
-            "Referer": "https://anichin.cafe",
+            "Referer": "https://s24.anichin.blog",
         }
     })
     const datas = await scrapeSeries(req, r)
@@ -37,7 +37,7 @@ const seriesData = async (req, res) => {
         page: 1,
         pagination: 1,
     //   status: e?.response?.status,
-    //   data: e?.response?.data
+        // data: e?.response?.data
       datas: []
     })
   }
@@ -46,12 +46,12 @@ const seriesData = async (req, res) => {
 const movieData = async (req, res) => {
   try {
     const { page = 1 } = req.query
-    const r = await axios.get(`${process.env.ANICHIN_URL}/donghua/?page=${page}&type=movie`, {
+    const r = await axios.get(`${process.env.ANICHIN_URL}/series/?type=movie&page=${page}`, {
         headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
-            "Referer": "https://anichin.cafe",
+            "Referer": "https://s24.anichin.blog",
         }
     })
     const datas = await scrapeMovie(req, r)
@@ -77,13 +77,13 @@ const genre = async (req, res) => {
     try {
         const {page = 1, type} = req.query
         const { genre } = req.params
-        const axiosRequest = await axios.get(`${process.env.ANICHIN_URL}/donghua/?page=${page}&genre%5B%5D=${genre}&type=${type}&order=update`, {
+        const axiosRequest = await axios.get(`${process.env.ANICHIN_URL}/series/?page=${page}&genre%5B%5D=${genre}&type=${type}&order=update`, {
             maxRedirects: 0,
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                 "Accept-Language": "en-US,en;q=0.5",
-                "Referer": "https://anichin.digital",
+                "Referer": "https://s24.anichin.blog",
             }
         })
 
@@ -108,7 +108,7 @@ const detailData = async (req, res) => {
     try {
         const { endpoint } = req.params
 
-        const axiosRequest = await axios.get(`${process.env.ANICHIN_URL}/donghua/${endpoint}`, { headers })
+        const axiosRequest = await axios.get(`${process.env.ANICHIN_URL}/series/${endpoint}`, { headers })
 
         const data = await scrapeDetail({ endpoint }, axiosRequest)
 

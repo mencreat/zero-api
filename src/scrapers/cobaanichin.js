@@ -19,7 +19,7 @@ const scrapeSeries = async (req, res) => {
         const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  || null
         const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
         const url = $(e).find("div.bsx > a").attr("href")
-        const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
+        const endpoint = url.substring(url.indexOf("/series/") + 8, url.length)
         
         dataObject.title = title
         dataObject.title_alt = title_alt
@@ -32,7 +32,7 @@ const scrapeSeries = async (req, res) => {
     })
 
     return {
-        pagination: 12,
+        pagination: 9,
         datas
     }
 }
@@ -55,7 +55,7 @@ const scrapeMovie = async (req, res) => {
         const thumbnail = $(e).find("div.bsx > a > div.limit > img").attr("src")  || null
         const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
         const url = $(e).find("div.bsx > a").attr("href")
-        const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
+        const endpoint = url.substring(url.indexOf("/series/") + 8, url.length)
         
         dataObject.title = title
         dataObject.title_alt = title_alt
@@ -86,7 +86,7 @@ const scrapeByGenre = async (req, res) => {
         const type = $(e).find("div.bsx > a > div.limit > div.typez").text()  || null
         const status = $(e).find("div.bsx > a > div.limit > div.bt > span.epx").text()  || null
         const url = $(e).find("div.bsx > a").attr("href")
-        const endpoint = url.substring(url.indexOf("/donghua/") + 9, url.length)
+        const endpoint = url.substring(url.indexOf("/series/") + 8, url.length)
 
         dataObject.title = title
         dataObject.thumbnail = thumbnail
@@ -113,10 +113,10 @@ const scrapeDetail = async (req, res) => {
 
     const title = $(parent).find("div.animefull > div.bigcontent > div.infox > h1").text()
     const titleAlt = $(parent).find("div.animefull > div.bigcontent > div.thumbook > div.thumb > img").attr("title") || null
-    const synopsis = $(parent).find("div.synp > div.entry-content > p").map((i, el) => $(el).text().trim()).get().join('\n\n').replace(/Berikut adalah poin-poin penting dari sinopsisnya:/, '')
+    const synopsis = $(parent).find("div.synp > div.entry-content").children().map((i, el) => $(el).text().trim()).get().filter(Boolean).join('\n\n').replace(/anichin/gi, 'Shirokaze') || null
     const thumbnail = $(parent).find("div.animefull > div.bigcontent > div.thumbook > div.thumb > img").attr("src")
-    const description = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
-    const midesc = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.mindesc").html().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
+    const description = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '').replace(/anichin/gi, 'SHIROKAZE') || null
+    const midesc = $(parent).find("div.animefull > div.bigcontent > div.infox > div.ninfo > div.mindesc").html().replace(/[\n\r\t\\]+/g, '').replace(/anichin/gi, 'SHIROKAZE') || null
     const rating = $(parent).find("div.rt > div.rating > strong").text().trim() || null
     const trailerSrc = $(parent).find("div.trailer > div.tply > iframe").attr("src") || null
     const trailerTitle = $(parent).find("div.trailer > div.tply > iframe").attr("title") || null
@@ -159,7 +159,7 @@ const scrapeDetail = async (req, res) => {
         const title = a.find("div.epl-title").text().trim()
         const date = a.find("div.epl-date").text().trim()
         const endpoint = a.attr("href")
-        const slug = endpoint.substring(endpoint.indexOf("/anichin.digital/") + 17, endpoint.length)
+        const slug = endpoint.substring(endpoint.indexOf("/s24.anichin.blog/") + 18, endpoint.length)
 
         episodes.push({
             num,
@@ -183,10 +183,11 @@ const scrapeDetail = async (req, res) => {
     data.director = infoObj["Sutradara"]
     data.studio = infoObj["Studio"]
     data.updated = infoObj["Diperbarui pada"]
-    data.totalEpisode = parseInt(infoObj["Episode"], 10) || 0
+    data.totalEpisode = parseInt(infoObj["Episode"], 10) || episodes.length
     data.type = infoObj["Tipe"]
     data.penerbit = infoObj["Diposting oleh"]
     data.genres = genres
+    data.country = negaraStr
     data.trailer = trailer
     data.artist = artistList
     data.negara = negaraList
@@ -217,11 +218,11 @@ const scrapeWacth = async (req, res) => {
 
     const title = $(parent).find("div.single-info > div.infox > div.infolimit > h2").text()
     const titleAlt = $(parent).find("div.single-info > div.infox > div.infolimit > span.alter").text() 
-    const synopsis = $(parent).find("div.single-info > div.infox > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '')
+    const synopsis = $(parent).find("div.single-info > div.infox > div.info-content > div.desc").text().replace(/[\n\r\t\\]+/g, '').replace(/anichin/gi, 'Shirokaze')
     const rating = $(parent).find("div.single-info > div.infox > div.rating > strong").text().replace(/Rating /, '') || null
     const thumbnail = $(parent).find("div.megavid > div.mvelement > div.meta > div.tb > img").attr("src")
     const thumbnailAlt = $(parent).find('div.megavid > div.mvelement > div.meta > div.tb > meta[itemprop="url"]').attr("content")
-    const description = $(parent).find("div.entry-content > div.infx > p").text().replace(/[\n\r\t\\]+/g, '').replace(/ANICHIN/g, 'STREAMCUY') || null
+    const description = $(parent).find("div.entry-content > div.infx > p").text().replace(/[\n\r\t\\]+/g, '').replace(/anichin/gi, 'Shirokaze') || null
     // const testing = $(parent).find('div.mctn > div.dlbox > div.video-nav > div.mobius > select.mirror').html()
     
     const spans = $(parent).find("div.single-info > div.infox > div.info-content > div.spe > span")
@@ -327,10 +328,11 @@ const scrapeWacth = async (req, res) => {
     data.director = infoObj["Sutradara"]
     data.type = infoObj["Tipe"]
     data.donlot = downloadLinks
+    data.country = negaraStr
     data.negara = negaraList
     data.artist = artistList
     data.server = serverList
-    data.totalEpisode = parseInt(infoObj["Episode"], 10) || 0
+    data.totalEpisode = parseInt(infoObj["Episode"], 10) || episodes.length
     data.episodes = episodes
     
     // genres
